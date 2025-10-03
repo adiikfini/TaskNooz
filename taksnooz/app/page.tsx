@@ -1,9 +1,10 @@
+// app/page.tsx
 "use client";
 
 import { useState } from "react";
-import { Board } from "../types/board";
-import { Content } from "next/font/google";
+import { Board, Item } from "../types/board";
 
+// Data awal Board
 const initialBoardData: Board = {
   columns: {
     "col-1": {
@@ -37,10 +38,52 @@ const initialBoardData: Board = {
   columnOrder: ['col-1', 'col-2','col-3','col-4','col-5',]
 };
 
+// Komponen baru untuk form tambah kartu
+function AddCardForm({columnId, onAddCard, onCancel}:{ columnId: string, onAddCard: (columnId: string, content: string) => void; onCancel: () => void; }) {
+  const [cardContent, setCardContent] = useState('');
 
+  const handleAddClick = () =>{
+    if(cardContent.trim()){
+      onAddCard(columnId, cardContent.trim());
+      setCardContent('');
+    }
+  }
+
+  return(
+    <div> 
+      <textarea
+        className="add-card-textarea mt-4"
+        rows={3}
+        placeholder="Masukan judul untuk kartu ini"
+        value={cardContent}
+        onChange={(e) => setCardContent(e.target.value)}
+        autoFocus
+      />
+      <div className = "add-card-controls">
+        <button onClick={handleAddClick} className="add-submit-btn">Tambah Kartu</button>
+        <button onClick={onCancel} className="add-card-cancel-btn">&time;</button>
+      </div>
+    </div>
+  )
+}
+
+//main
 export default function homePage() {
   const [board, setBoard] = useState<Board>(initialBoardData);
+  // State baru untuk melacak kolom mana yang sedang dalam mode "tambah kartu"
+  const [addingToColumn, setAddingToColumn] = useState<string | null>(null);
+  // Fungsi untuk menangani penambahan kartu baru
+  const handleAddCard = (columnId: string, content: string) => {
+    const newCard: Item = {
+      id: `item-${Date.now()}`,
+      content,
+    }
+    const newBoard = {...board };
+    newBoard.columns[columnId].items.push(newCard);
 
+    setBoard(newBoard);
+    setAddingToColumn(null);
+  }
   return(
     <div className = "h-screen flex flex-col">
       <header className ="bg-black/30 p-3">
@@ -58,11 +101,22 @@ export default function homePage() {
                 <div className="space-y-2">
                   {column.items.map(item =>
                     <div key={item.id} className="bg-white rounded-b-md p-2 shadow"> 
-                      <p>{item.content}</p>
+                      <p className="text-sm text-gray-800">{item.content}</p>
                     </div>
                   )}
-                  
                 </div>
+                {/* Logika untuk menampilkan form atau tombol "Tambah Kartu" */}
+                { addingToColumn === column.id ?(
+                  <AddCardForm 
+                    columnId={column.id}
+                    onAddCard={handleAddCard}
+                    onCancel={() => setAddingToColumn(null)}
+                    />
+                   ) : (
+                    <button onClick={()=> setAddingToColumn(column.id)} className="add-card-btn">
+                      + Tambah Kartu
+                    </button>
+                  )}
               </div>
             );
           })
