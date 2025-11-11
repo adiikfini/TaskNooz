@@ -10,56 +10,56 @@ const Navbar = () => {
 
   return (
     // Navbar Utama: Fixed, berwarna hitam/oranye, dengan z-index tinggi
-    <div className="bg-black shadow-md opacity-95 fixed w-full z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+    <div className="fixed z-50 w-full bg-black opacity-95 shadow-md">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
             <img
               src="/logo.png"
               alt="Teknoz Logo"
-              className="w-18 h-18 object-contain"
+              className="h-15 w-1 object-contain"
             />
             <span className="text-2xl font-bold text-white">Tectnooz</span>
           </div>
           {/* Navigasi Desktop */}
-          <nav className="hidden md:flex space-x-8 items-center text-white font-medium">
+          <nav className="hidden items-center space-x-8 font-medium text-white md:flex">
             <a
               href="#"
-              className="hover:text-orange-400 transition duration-150 whitespace-nowrap"
+              className="whitespace-nowrap transition duration-150 hover:text-orange-400"
             >
               About Us
             </a>
             <a
               href="#"
-              className="hover:text-orange-400 transition duration-150 whitespace-nowrap"
+              className="whitespace-nowrap transition duration-150 hover:text-orange-400"
             >
               Services
             </a>
             <a
               href="#"
-              className="hover:text-orange-400 transition duration-150 whitespace-nowrap"
+              className="whitespace-nowrap transition duration-150 hover:text-orange-400"
             >
               Blog List
             </a>
             <a
               href="#"
-              className="hover:text-orange-400 transition duration-150 whitespace-nowrap"
+              className="whitespace-nowrap transition duration-150 hover:text-orange-400"
             >
               Teams
             </a>
           </nav>
           {/* Login Button */}
-          <div className="hidden md:flex items-center space-x-4">
-            <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-lg shadow-orange-500/50">
+          <div className="hidden items-center space-x-4 md:flex">
+            <button className="rounded-lg bg-orange-500 px-6 py-3 font-semibold text-white shadow-lg shadow-orange-500/50 transition duration-300 hover:bg-orange-600">
               Login
             </button>
           </div>
           {/* Hamburger Button */}
-          <div className="md:hidden flex items-center">
+          <div className="flex items-center md:hidden">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-orange-500 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500"
+              className="inline-flex items-center justify-center rounded-md p-2 text-orange-500 hover:bg-gray-700 hover:text-white focus:ring-2 focus:ring-orange-500 focus:outline-none focus:ring-inset"
               aria-expanded={isOpen}
             >
               <span className="sr-only">Open main menu</span>
@@ -105,17 +105,17 @@ const Navbar = () => {
       </div>
       {/* Mobile Menu Drawer */}
       <div
-        className={`md:hidden transition-all duration-300 ease-in-out transform ${
+        className={`transform transition-all duration-300 ease-in-out md:hidden ${
           isOpen
-            ? "max-h-80 opacity-100 py-2"
-            : "max-h-0 opacity-0 overflow-hidden"
+            ? "max-h-80 py-2 opacity-100"
+            : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
-        <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 text-center">
+        <div className="space-y-1 px-2 pt-2 pb-3 text-center sm:px-3">
           <a
             onClick={toggleMenu}
             href="#"
-            className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
+            className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
           >
             About Us
           </a>
@@ -123,7 +123,7 @@ const Navbar = () => {
           <a
             onClick={toggleMenu}
             href="#"
-            className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
+            className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
           >
             Services
           </a>
@@ -131,7 +131,7 @@ const Navbar = () => {
           <a
             onClick={toggleMenu}
             href="#"
-            className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
+            className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
           >
             Blog List
           </a>
@@ -139,12 +139,12 @@ const Navbar = () => {
           <a
             onClick={toggleMenu}
             href="#"
-            className="block px-3 py-2 rounded-md text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
+            className="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-gray-700 hover:text-orange-400"
           >
             Teams
           </a>
           {/* Mobile Login Button */}
-          <button className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-300">
+          <button className="mt-4 w-full rounded-lg bg-orange-500 px-6 py-2 font-semibold text-white transition duration-300 hover:bg-orange-600">
             Login
           </button>
         </div>

@@ -24,3 +24,20 @@ body {
   color: var(--foreground);
   font-family: Helvetica, sans-serif;
 }
+
+/* src/app/globals.css */
+
+/* ... (kode impor tailwind Anda) ... */
+
+/* Kustomisasi Tema Swiper Carousel */
+:root {
+  /* Mengubah warna panah & titik aktif menjadi oranye */
+  --swiper-theme-color: #F97316; /* text-orange-600 */
+
+  /* Opsional: Mengubah warna titik yang tidak aktif */
+  --swiper-pagination-bullet-inactive-color: #4B5563; /* text-gray-600 */
+  --swiper-pagination-bullet-inactive-opacity: 0.5;
+
+  /* Opsional: Membuat panah navigasi lebih gelap */
+  --swiper-navigation-color: #F97316;
+}
