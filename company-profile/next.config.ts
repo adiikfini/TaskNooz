@@ -2,9 +2,6 @@ import type { NextConfig } from "next";
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
-  /* config options here */
-  
-  // 1. Tambahkan konfigurasi 'images' di sini
   images: {
     remotePatterns: [
       {

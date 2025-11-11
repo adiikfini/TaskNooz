@@ -1,11 +1,9 @@
-// src/app/teams/page.tsx
-
 import React from 'react';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-// Tipe data untuk anggota tim (setelah kita modifikasi)
+// Tipe data untuk anggota tim 
 interface TeamMember {
   id: string;
   name: {
@@ -16,12 +14,11 @@ interface TeamMember {
     large: string;
   };
   email: string;
-  // Properti kustom yang akan kita tambahkan
   role: string;
   bio: string;
 }
 
-// Data dummy untuk Role dan Bio (karena API tidak menyediakannya)
+// Data dummy untuk Role dan Bio
 const dummyRoles = [
   "Lead Automation Engineer",
   "AI/ML Specialist",
@@ -141,8 +138,6 @@ export default async function TeamsPage() {
                       <p className="text-gray-400 text-sm mt-3">
                         {member.bio}
                       </p>
-                      {/* Opsional: Tampilkan email sebagai "bio" jika ingin data asli */}
-                      {/* <p className="text-gray-400 text-sm mt-3 break-words">{member.email}</p> */}
                     </div>
                   </div>
                 ))

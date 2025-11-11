@@ -78,12 +78,9 @@ function ServiceDetails() {
       {/* === SECTION 2: INTELLIGENT DOCUMENT PROCESSING === */}
       <section className="py-16 md:py-20 bg-gray-800 text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* md:flex-row-reverse untuk layout bergantian */}
           <div className="flex flex-col md:flex-row-reverse items-center gap-12 md:gap-16">
-            
             {/* Beri background kontras untuk icon box */}
             <IconBox icon={<img src="/audit.png" alt="Audit Icon" className="w-40 h-40" />} />
-
             <div className="w-full md:w-1/2 text-center md:text-left">
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white mb-6">
                 Intelligent Document <span className="text-orange-600">Processing (IDP)</span>
