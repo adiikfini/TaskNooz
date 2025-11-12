@@ -1,5 +1,5 @@
 import React from 'react';
-import Image from 'next/image';
+// Use native <img> for external avatars to avoid Next/Image optimizer issues in some production hosts
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -118,11 +118,11 @@ export default async function TeamsPage() {
                   >
                     {/* Gambar */}
                     <div className="pt-6">
-                      <Image 
-                        src={member.picture.large} 
+                      <img
+                        src={member.picture.large}
                         alt={`${member.name.first} ${member.name.last}`}
-                        width={128} // w-32
-                        height={128} // h-32
+                        width={128}
+                        height={128}
                         className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-orange-500"
                       />
                     </div>
