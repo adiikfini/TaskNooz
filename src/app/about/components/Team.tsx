@@ -11,7 +11,7 @@ const teamMembers = [
     name: "Ferdinand Prasetyo",
     role: "Chief Executive Officer (CEO)",
     bio: "Leads the company's mission to revolutionize business automation.",
-    imageUrl: "/Ferdinand-prasetyo.png",
+    imageUrl: "/ferdinand.jpeg",
   },
   {
     name: "Kartika Sari",
