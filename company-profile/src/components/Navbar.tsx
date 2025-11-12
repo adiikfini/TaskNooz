@@ -26,7 +26,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo Section */}
           <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center space-x-3">
-            <img src="logo.png" alt="logo" className="w-15 h-15" />
+            <img src="/logo.png" alt="logo" className="w-15 h-15" />
             <span className="text-2xl font-bold text-white">Tectnooz</span>
           </Link>
 

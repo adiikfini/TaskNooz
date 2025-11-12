@@ -26,13 +26,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Teknoz Solutions",
+  title: "Tectnooz Solutions",
   description: "Intelligent Automation & RPA Solutions",
+  icons: {
+    icon: '/logo.png',
+    shortcut: '/logo.png',
+    apple: '/logo.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} ${inter.variable}`}>
+      <head>
+        {/* Explicit favicon links — ensures browsers pick up /logo.png instead of public/favicon.ico */}
+        <link rel="icon" href="/logo.png" />
+        <link rel="shortcut icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/logo.png" />
+      </head>
       <body className="antialiased bg-gray-900">
         <Providers>{children}</Providers>
       </body>
