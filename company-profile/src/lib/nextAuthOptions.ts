@@ -2,7 +2,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { NextAuthOptions } from "next-auth";
 
 const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
-const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
+// Accept either BACKENDLESS_REST_API_KEY or BACKENDLESS_API_KEY for compatibility
+const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? process.env.BACKENDLESS_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
 const BACKENDLESS_API_URL = process.env.BACKENDLESS_API_URL ?? "https://api.backendless.com";
 
 async function backendlessLogin(email?: string, password?: string) {
@@ -13,7 +14,17 @@ async function backendlessLogin(email?: string, password?: string) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ login: email, password }),
   });
-  if (!res.ok) return null;
+  // If login failed, log response body to help debugging (401/403 etc.)
+  if (!res.ok) {
+    let body: any = null;
+    try {
+      body = await res.json();
+    } catch (e) {
+      try { body = await res.text(); } catch (e) { body = null; }
+    }
+    console.error('[auth] Backendless login failed', { status: res.status, body, url });
+    return null;
+  }
   const data = await res.json();
   const userToken = res.headers.get("user-token") || (data && (data['user-token'] || data['userToken']));
   return { data, userToken };
@@ -36,6 +47,8 @@ export const nextAuthOptions: NextAuthOptions = {
           name: data.name || data.email,
           email: data.email,
           backendlessToken: userToken,
+          // Ensure we surface any role returned by Backendless so NextAuth callbacks can map it into the session
+          role: data.role ?? data.userRole ?? (Array.isArray(data.roles) ? data.roles[0] : undefined),
           backendlessUser: data,
         };
       },

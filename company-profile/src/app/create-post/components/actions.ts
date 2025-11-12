@@ -9,8 +9,13 @@ import { revalidatePath } from "next/cache";
 const PostSchema = z.object({
   title: z.string().min(5, { message: "Title must be at least 5 characters." }),
   summary: z.string().min(20, { message: "Summary must be at least 20 characters." }),
-  category: z.string().min(1, { message: "Please select a category." }),
-  published: z.string().optional(),
+  category: z.enum(["RPA", "AI/ML", "Case Studies", "Industry News"] as const),
+  published: z.preprocess((v) => {
+    // Accept boolean or string-like values
+    if (typeof v === 'boolean') return v ? 'true' : 'false';
+    if (typeof v === 'string') return v;
+    return undefined;
+  }, z.string().optional()),
 });
 
 // Tipe state formulir
@@ -33,6 +38,9 @@ export async function createPost(
   const user = (session as any)?.user;
   if (!user) return { success: false, message: 'Unauthorized. Please log in.' };
 
+  // Role enforcement: users can create posts, but only admins may publish immediately.
+  const role = (user as any)?.role ?? 'user';
+
   // 2. Validasi payload
   const validated = PostSchema.safeParse({
     title: payload.title,
@@ -47,6 +55,14 @@ export async function createPost(
 
   const { title, summary, category, published } = validated.data;
 
+  // Server-side logging of the sanitized payload for debugging (do NOT log secrets)
+  try {
+    console.info('[createPost] validated payload', { title, summary: summary.slice(0, 200), category, published });
+    if (payload.imageUrl) console.info('[createPost] imageUrl provided:', payload.imageUrl);
+  } catch (e) {
+    // swallow logging errors
+  }
+
   // 3. Siapkan payload untuk Backendless (image already uploaded by client to /api/upload)
   const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
   const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? process.env.BACKENDLESS_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
@@ -57,7 +73,8 @@ export async function createPost(
     title,
     summary,
     category,
-    published: Boolean(published && String(published) === 'true'),
+    // Only allow published=true if the user is an admin; otherwise save as draft (false)
+    published: role === 'admin' ? Boolean(published && String(published) === 'true') : false,
     author: user.name,
     authorEmail: user.email,
     ownerId: (user as any).id || (user as any).objectId,
@@ -70,17 +87,32 @@ export async function createPost(
   }
 
   try {
+    console.info('[createPost] sending to Backendless', { url: postUrl, payloadSummary: dataToSend.title });
     const res = await fetch(postUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(dataToSend),
     });
 
+    const text = await res.text().catch(() => '');
+    let parsed: any = null;
+    try { parsed = text ? JSON.parse(text) : null; } catch (e) { parsed = text; }
+
     if (!res.ok) {
-      const d = await res.json().catch(() => ({}));
-      return { success: false, message: d.message || 'Failed to create blog post.' };
+      console.error('[createPost] Backendless POST failed', { status: res.status, body: parsed });
+      const serverMessage = parsed?.message || (typeof parsed === 'string' ? parsed : 'Failed to create blog post.');
+      return { success: false, message: serverMessage };
+    }
+
+    // Success: log created record id if available
+    try {
+      const createdId = parsed?.objectId ?? parsed?.id ?? null;
+      console.info('[createPost] created blog id=', createdId);
+    } catch (e) {
+      // ignore
     }
   } catch (err) {
+    console.error('[createPost] exception while creating post', String(err));
     return { success: false, message: 'A server error occurred.' };
   }
 

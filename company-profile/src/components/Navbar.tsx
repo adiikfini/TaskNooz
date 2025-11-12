@@ -25,10 +25,10 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo Section */}
-          <div className="flex items-center space-x-3">
-            <img src="logo.png" alt="logo" className="w-15 h-15"/>
+          <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center space-x-3">
+            <img src="logo.png" alt="logo" className="w-15 h-15" />
             <span className="text-2xl font-bold text-white">Tectnooz</span>
-          </div>
+          </Link>
 
           {/* Navigasi Desktop */}
           <nav className="hidden md:flex space-x-8 items-center text-white font-medium">

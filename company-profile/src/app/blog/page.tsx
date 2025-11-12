@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
@@ -33,6 +34,12 @@ export default function BlogPage() {
   const [error, setError] = useState<string | null>(null);
   const [rawResponse, setRawResponse] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const { data: session } = useSession();
+  const rawRole = (session as any)?.user?.role;
+  const isAdmin = Boolean(
+    (typeof rawRole === 'string' && rawRole.toLowerCase() === 'admin') ||
+    (session as any)?.user?.name === 'Admin'
+  );
 
   useEffect(() => {
 
@@ -100,6 +107,22 @@ export default function BlogPage() {
   const isLocalOrDataUrl = (value?: string) => {
     if (!value || typeof value !== 'string') return false;
     return value.startsWith('/') || value.startsWith('data:');
+  };
+
+  // Utility: format a date string into a short date (e.g. "Nov 12, 2025")
+  const formatDateOnly = (value?: string | null) => {
+    if (!value) return '';
+    try {
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+    } catch (e) {
+      // fallthrough
+    }
+    // If parsing failed, try to strip time portion if present
+    if (typeof value === 'string' && value.includes('T')) return value.split('T')[0];
+    return value;
   };
 
   return (
@@ -206,10 +229,37 @@ export default function BlogPage() {
                         </Link>
                         
                         {/* Konten Teks */}
-                        <div className="p-6 flex flex-col grow">
+                        <div className="p-6 flex flex-col grow relative">
+                          {isAdmin && (
+                            <div className="absolute top-4 right-4">
+                              <button
+                                onClick={async () => {
+                                  if (!confirm('Delete this post? This cannot be undone.')) return;
+                                  try {
+                                    const res = await fetch(`/api/blogs/${encodeURIComponent(post.objectId as string)}`, {
+                                      method: 'DELETE',
+                                      credentials: 'include',
+                                    });
+                                    const json = await res.json().catch(() => ({}));
+                                    if (!res.ok) {
+                                      alert('Delete failed: ' + (json?.error || JSON.stringify(json)));
+                                      return;
+                                    }
+                                    // remove from local state
+                                    setPosts((p) => p.filter((x) => x.objectId !== post.objectId));
+                                  } catch (e) {
+                                    alert('Delete failed: ' + String(e));
+                                  }
+                                }}
+                                className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          )}
                           {/* Author & Date */}
                           <div className="text-sm text-gray-400 mb-2">
-                            By <span className="font-medium text-gray-300">{post.author}</span> on {post.publishDate}
+                            By <span className="font-medium text-gray-300">{post.author}</span> on {formatDateOnly(post.publishDate)}
                           </div>
                           
                           {/* Judul */}

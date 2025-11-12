@@ -49,7 +49,9 @@ export default function RegisterPage() {
       
       if (!res.ok) {
         // Tangkap error dari API (misal: "User already exists")
-        setError(data.message || 'Registration failed.');
+        // Server now returns { error, debug } on failure; prefer data.error first.
+        console.debug('[register] server response', data);
+        setError(data.error || data.message || 'Registration failed.');
       } else {
         // Berhasil
         setSuccess('Registration successful! Redirecting to login...');
