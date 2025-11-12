@@ -24,24 +24,19 @@ export type CreatePostFormState = {
   message: string;
 };
 
-// Use the centralized helper that supports PUT then POST fallback
-// upload helper removed — we now accept imageBase64 from the client
-
 // FUNGSI SERVER ACTION UTAMA
 export async function createPost(
   prevState: CreatePostFormState,
   payload: { title: string; summary: string; category: string; published?: boolean | string; imageUrl?: string }
 ): Promise<CreatePostFormState> {
 
-  // 1. Periksa Sesi Pengguna
+  // Periksa Sesi Pengguna
   const session = await auth();
   const user = (session as any)?.user;
   if (!user) return { success: false, message: 'Unauthorized. Please log in.' };
-
-  // Role enforcement: users can create posts, but only admins may publish immediately.
   const role = (user as any)?.role ?? 'user';
 
-  // 2. Validasi payload
+  // Validasi payload
   const validated = PostSchema.safeParse({
     title: payload.title,
     summary: payload.summary,
@@ -55,7 +50,6 @@ export async function createPost(
 
   const { title, summary, category, published } = validated.data;
 
-  // Server-side logging of the sanitized payload for debugging (do NOT log secrets)
   try {
     console.info('[createPost] validated payload', { title, summary: summary.slice(0, 200), category, published });
     if (payload.imageUrl) console.info('[createPost] imageUrl provided:', payload.imageUrl);
@@ -63,7 +57,6 @@ export async function createPost(
     // swallow logging errors
   }
 
-  // 3. Siapkan payload untuk Backendless (image already uploaded by client to /api/upload)
   const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
   const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? process.env.BACKENDLESS_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
   const BACKENDLESS_API_URL = process.env.BACKENDLESS_API_URL ?? "https://api.backendless.com";
@@ -73,7 +66,6 @@ export async function createPost(
     title,
     summary,
     category,
-    // Only allow published=true if the user is an admin; otherwise save as draft (false)
     published: role === 'admin' ? Boolean(published && String(published) === 'true') : false,
     author: user.name,
     authorEmail: user.email,

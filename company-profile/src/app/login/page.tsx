@@ -43,7 +43,7 @@ export default function LoginPage() {
     }
   };
 
-  // Tampilkan loading saat status 'loading' atau jika sudah 'authenticated' (menunggu redirect)
+  // Tampilkan loading
   if (status === "loading" || status === "authenticated") {
     return (
       <div>

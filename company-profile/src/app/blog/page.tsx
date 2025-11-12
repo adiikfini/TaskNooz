@@ -28,7 +28,7 @@ const categories = ['All', 'RPA', 'AI/ML', 'Case Studies', 'Industry News'];
 
 export default function BlogPage() {
   
-  // --- State Management ---
+  //State Management
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,9 +50,7 @@ export default function BlogPage() {
         const json = await res.json().catch(() => null);
         console.log('GET /api/blogs status=', res.status, 'ok=', res.ok, 'body=', json);
         let postsData: any[] = [];
-          // keep the raw backend response available for debugging on the page
           setRawResponse(json);
-          // If backend returned an error payload, surface it in the page-level error so it's visible
         if (json == null) {
           postsData = [];
         } else if (Array.isArray(json)) {
@@ -92,7 +90,6 @@ export default function BlogPage() {
     return post.category === selectedCategory;
   });
 
-  // Utility: check if a value is an absolute HTTP/HTTPS URL
   const isAbsoluteHttpUrl = (value?: string) => {
     if (!value || typeof value !== 'string') return false;
     try {
@@ -103,13 +100,11 @@ export default function BlogPage() {
     }
   };
 
-  // Utility: check if value is a local path (served from same host) or a data URI
   const isLocalOrDataUrl = (value?: string) => {
     if (!value || typeof value !== 'string') return false;
     return value.startsWith('/') || value.startsWith('data:');
   };
 
-  // Utility: format a date string into a short date (e.g. "Nov 12, 2025")
   const formatDateOnly = (value?: string | null) => {
     if (!value) return '';
     try {
@@ -118,9 +113,7 @@ export default function BlogPage() {
         return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
       }
     } catch (e) {
-      // fallthrough
     }
-    // If parsing failed, try to strip time portion if present
     if (typeof value === 'string' && value.includes('T')) return value.split('T')[0];
     return value;
   };
@@ -131,7 +124,7 @@ export default function BlogPage() {
 
       <main className="pt-20">
         
-        {/* --- Hero Section --- */}
+        {/*Hero Section*/}
         <section className="bg-gray-800 py-16 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-6">
@@ -143,7 +136,7 @@ export default function BlogPage() {
           </div>
         </section>
 
-        {/* --- Filter Section --- */}
+        {/*Filter Section*/}
         <section className="py-8 bg-gray-900 border-b border-gray-700">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap justify-center gap-2">
@@ -166,7 +159,7 @@ export default function BlogPage() {
           </div>
         </section>
 
-        {/* --- Blog Grid Section --- */}
+        {/*Blog Grid Section*/}
         <section className="py-20 bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -211,12 +204,11 @@ export default function BlogPage() {
                               );
                             }
                             if (isLocalOrDataUrl(src)) {
-                              // For local paths (e.g. /uploads/...) or data: URIs, render a normal <img>
                               return (
                                 <img src={src} alt={post.title} className="w-full h-full object-cover" />
                               );
                             }
-                            // Fallback placeholder when there's no valid image
+  
                             return (
                               <div className="w-full h-full bg-gradient-to-r from-orange-600 to-orange-700 flex items-center justify-center">
                                 <span className="text-white text-center px-4">📰 No Image</span>
@@ -292,7 +284,6 @@ export default function BlogPage() {
                   <div className="col-span-full text-center py-12">
                     <h3 className="text-2xl font-bold text-gray-400">No posts found</h3>
                     <p className="text-gray-500">There are no articles in the "{selectedCategory}" category yet.</p>
-                    {/* Developer debug: show raw /api/blogs response so we can map fields */}
                     <div className="mt-6 text-left text-xs text-gray-400 max-w-4xl mx-auto px-4">
                       <div className="font-semibold text-sm text-gray-300 mb-2">Debug: /api/blogs response</div>
                       <pre className="whitespace-pre-wrap break-words bg-gray-800 p-3 rounded text-[11px]">

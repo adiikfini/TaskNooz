@@ -38,14 +38,14 @@ function Testimonials() {
           </p>
         </div>
 
-        {/* Grid Testimoni (Responsif) */}
+        {/* Grid Testimoni*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonialsData.map((testimonial, index) => (
             <div 
               key={index}
               className="bg-gray-900 p-8 rounded-xl shadow-lg border border-gray-700 hover:border-orange-500 transition-colors duration-300 flex flex-col h-full"
             >
-              {/* Rating Bintang (Menggunakan data dummy) */}
+              {/* Rating Bintang*/}
               <div className="flex justify-center mb-4 text-2xl">
                 {testimonial.ratingElement}
               </div>

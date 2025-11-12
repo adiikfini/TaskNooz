@@ -27,7 +27,7 @@ function Jumbotron() {
             reduce errors, and focus on growing your business.
           </p>
 
-          {/* Action Button - w-full di mobile, sm:w-auto di desktop */}
+          {/* Action Button desktop */}
           <div className="mb-10 flex justify-center">
             <a
               href="#"

@@ -21,7 +21,6 @@ export async function DELETE(req: Request, context: any) {
     const role = (user as any)?.role ?? 'user';
     if (role !== 'admin') return NextResponse.json({ error: 'Forbidden: admin only' }, { status: 403 });
 
-  // Unwrap params which can be a promise in Next's dynamic route context
   const rawParams = (context as any)?.params;
   const params = rawParams && typeof rawParams.then === 'function' ? await rawParams : rawParams;
   const id = params?.id as string | undefined;
@@ -31,7 +30,6 @@ export async function DELETE(req: Request, context: any) {
   }
     const url = await getBackendlessUrl(id);
     console.info('[DELETE /api/blogs/[id]] deleting id=', id, { url, by: user?.email || user?.name });
-    // Send an explicit empty JSON body because Backendless may try to parse the body when Content-Type is set
     const res = await fetch(url, { method: 'DELETE', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({}) });
   const text = await res.text().catch(() => '');
   let parsed: any = null;

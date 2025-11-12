@@ -52,8 +52,6 @@ export default function CreatePostForm() {
     setImagePreview(v || null);
   };
 
-  // imageUrl is provided by user directly; no file upload to /api/upload is required here
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setClientError(null);
@@ -105,8 +103,6 @@ export default function CreatePostForm() {
       setClientError(state.message);
       addToast({ type: 'error', message: 'Server error', details: state.message });
     }
-
-    // stop submitting when server action has finished (either success or message)
     if (state.message || state.success) {
       setIsSubmitting(false);
     }
@@ -299,7 +295,7 @@ export default function CreatePostForm() {
 
 
 
-      {/* Tombol Submit (Komponen kustom kita) */}
+      {/* Tombol Submit */}
 
       <div>
 

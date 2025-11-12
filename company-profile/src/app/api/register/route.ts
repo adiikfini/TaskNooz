@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
-// Accept either BACKENDLESS_REST_API_KEY or BACKENDLESS_API_KEY for backwards compatibility
 const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? process.env.BACKENDLESS_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
 const BACKENDLESS_API_URL = process.env.BACKENDLESS_API_URL ?? "https://api.backendless.com";
 
@@ -18,7 +17,6 @@ export async function POST(req: Request) {
       body: JSON.stringify({ email, password, name }),
     });
 
-    // Try to parse response body safely (could be JSON or text)
     let data: any = null;
     try {
       data = await res.json();
@@ -31,9 +29,7 @@ export async function POST(req: Request) {
     }
 
     if (!res.ok) {
-      // Log full backend response for easier debugging (server console)
       console.error('[register] Backendless register failed', { status: res.status, body: data });
-      // Return backend message when available
       const message = (data && (data.message || data.error || JSON.stringify(data))) || 'Registration failed';
       return NextResponse.json({ error: message, debug: { status: res.status, body: data } }, { status: res.status });
     }

@@ -1,4 +1,3 @@
-// src/app/about/components/Culture.tsx
 
 import React from 'react'
 
@@ -27,7 +26,7 @@ const values = [
 
 function Culture() {
   return (
-    <section className="py-20 bg-gray-800"> {/* Warna latar berbeda untuk kontras */}
+    <section className="py-20 bg-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center mb-16">
@@ -39,11 +38,7 @@ function Culture() {
           </p>
         </div>
 
-        {/* Grid Kartu Nilai (Responsif):
-          - 1 kolom di mobile (default)
-          - 2 kolom di tablet (md)
-          - 4 kolom di desktop (lg)
-        */}
+        {/* Grid Kartu Nilai (Responsif)*/}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {values.map((value, index) => (
             <div 

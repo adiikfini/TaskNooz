@@ -4,12 +4,10 @@ function Company_overview() {
   return (
     <section className="bg-gray-900 py-20 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Konten dibagi menjadi 2 kolom (Gambar & Teks) */}
         <div className="flex flex-col items-center gap-12 md:flex-row md:items-start">
           {/* KOLOM KIRI: GAMBAR DENGAN AKSEN ORANYE */}
           <div className="relative mb-10 flex w-full justify-center md:mb-0 md:w-1/2">
             <div className="relative w-full max-w-sm sm:max-w-md lg:max-w-lg">
-              {/* Gambar Utama (relative z-10) */}
               <div className="relative z-10 w-full overflow-hidden rounded-xl shadow-2xl">
                 <img
                   src="/meeting.jpg"
@@ -17,7 +15,6 @@ function Company_overview() {
                   className="h-auto max-h-[400px] w-full object-cover"
                 />
               </div>
-              {/* Aksen Oranye di belakang gambar */}
               <div className="absolute top-0 left-0 z-0 h-full w-full translate-x-3 translate-y-3 transform rounded-xl bg-orange-600"></div>
             </div>
           </div>
@@ -55,7 +52,7 @@ function Company_overview() {
         </div>
       </div>
 
-      {/* Bagian Bawah: Team, Mission & Vision (Tidak ada perubahan di sini) */}
+      {/* Bagian Bawah: Team, Mission & Vision */}
       <div className="mx-auto max-w-7xl px-4 pt-20 sm:px-6 lg:px-8">
         <h3 className="mb-10 py-5 text-center text-4xl font-extrabold text-white">
           Team & Culture

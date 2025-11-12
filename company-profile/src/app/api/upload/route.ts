@@ -3,7 +3,6 @@ import { uploadImageToBackendless } from '@/lib/backendlessFileHelper';
 import * as fs from 'fs';
 import path from 'path';
 
-// Ensure this route runs in the Node runtime (Buffer and Node blobs used in helper)
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
@@ -15,7 +14,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
-    // Diagnostic logs
     try {
       console.log('Upload request received. fileName=', file.name, 'size=', (file as any).size, 'type=', file.type);
     } catch (e) {
@@ -24,10 +22,7 @@ export async function POST(req: Request) {
 
   const arrayBuf = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuf);
-  // let helper generate its own timestamped unique filename — pass the original name
   const fileName = file.name.replace(/\s+/g, '-');
-
-    // Log environment presence for quicker debugging
     console.log('Backendless env:', {
       BACKENDLESS_API_URL: process.env.BACKENDLESS_API_URL ? '<set>' : '<missing>',
       BACKENDLESS_APP_ID: process.env.BACKENDLESS_APP_ID ? '<set>' : '<missing>',
@@ -35,18 +30,15 @@ export async function POST(req: Request) {
     });
 
     const result = await uploadImageToBackendless(buffer, fileName);
-    // result is now { url: string | null, debug?: string[] }
     if (result && result.url) {
       console.log('Upload succeeded to Backendless, url=', result.url);
       return NextResponse.json({ url: result.url });
     }
 
-    // Fallback: save to local public/uploads directory so uploads always work in dev
     try {
       const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
       if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
-      // create unique filename
       const ext = path.extname(fileName) || '';
       const base = path.basename(fileName, ext).replace(/[^a-zA-Z0-9-_]/g, '-');
       const unique = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${base}${ext}`;

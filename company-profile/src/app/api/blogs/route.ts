@@ -6,7 +6,6 @@ import path from 'path';
 export const runtime = 'nodejs';
 
 const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
-// Accept either BACKENDLESS_REST_API_KEY or BACKENDLESS_API_KEY (some scripts set the latter)
 const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? process.env.BACKENDLESS_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
 const BACKENDLESS_API_URL = process.env.BACKENDLESS_API_URL ?? "https://api.backendless.com";
 
@@ -25,20 +24,15 @@ export async function GET() {
 		let parsed: any = null;
 		try { parsed = raw ? JSON.parse(raw) : null; } catch (e) { parsed = raw; }
 		if (!res.ok) {
-			// If Backendless is unavailable or returns an error, return an empty list so the UI shows "No posts"
 			console.error('[GET /api/blogs] Backendless /data/Blogs returned non-ok', res.status, parsed ?? raw);
 			return NextResponse.json({ data: [], error: parsed?.message || 'Failed to fetch blogs', debug: parsed ?? raw }, { status: 200 });
 		}
-		// Normalize backendless response into an array of posts
 		let postsArray: any[] = [];
 		if (Array.isArray(parsed)) postsArray = parsed;
 		else if (parsed && Array.isArray(parsed.data)) postsArray = parsed.data;
 		else if (parsed && typeof parsed === 'object') {
-			// sometimes backendless returns a single object
 			postsArray = [parsed];
 		}
-		// Map/normalize Backendless items to the UI Post shape so the frontend doesn't need
-		// to guess field names. This handles common variants (objectId/id, image/imageUrl, authorEmail etc.).
 		if (postsArray.length > 0) {
 			const normalized = postsArray.map((item: any) => {
 				const objectId = item.objectId ?? item.objectID ?? item.id ?? item.object_id ?? null;
@@ -47,7 +41,6 @@ export async function GET() {
 				const author = item.author ?? item.authorName ?? item.authorEmail ?? item.ownerId ?? 'Unknown';
 				const publishDate = item.publishDate ?? item.createdAt ?? item.created ?? item.publishedAt ?? null;
 				const categoryRaw = (item.category ?? '').toString();
-				// Normalize category to one of the known labels used by the UI
 				let category = 'Uncategorized';
 				const cr = categoryRaw.toLowerCase();
 				if (cr.includes('rpa')) category = 'RPA';
@@ -73,7 +66,6 @@ export async function GET() {
 			console.info('[GET /api/blogs] returning', { count: normalized.length, source: 'backendless' });
 			return NextResponse.json({ data: normalized, source: 'backendless' });
 		}
-		// If backendless returned empty list, we'll fall back to local sample data (dev convenience)
 		console.warn('[GET /api/blogs] Backendless returned no posts; attempting local fallback');
 		const fallbackPath = path.join(process.cwd(), 'data', 'blogs-fallback.json');
 		if (fs.existsSync(fallbackPath)) {
