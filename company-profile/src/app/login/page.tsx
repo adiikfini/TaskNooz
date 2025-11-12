@@ -16,7 +16,7 @@ export default function LoginPage() {
   // Redirect jika pengguna sudah login
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/"); // Redirect ke halaman utama
+      router.push("/"); 
     }
   }, [status, router]);
 

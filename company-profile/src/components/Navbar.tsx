@@ -14,6 +14,9 @@ export default function Navbar() {
     { href: "/blog", label: "Blog List" },
     { href: "/teams", label: "Teams" },
   ];
+  if (session) {
+    navLinks.splice(3, 0, { href: "/create-post", label: "Create Post"});
+  }
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -23,10 +26,8 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo Section */}
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-orange-500 flex items-center justify-center rounded-md">
-              <span className="text-white font-bold text-lg">T</span>
-            </div>
-            <span className="text-2xl font-bold text-white">Teknoz</span>
+            <img src="logo.png" alt="logo" className="w-15 h-15"/>
+            <span className="text-2xl font-bold text-white">Tectnooz</span>
           </div>
 
           {/* Navigasi Desktop */}
@@ -42,7 +43,7 @@ export default function Navbar() {
           <div className="hidden md:flex items-center space-x-4">
             {session ? (
               <>
-                <span className="text-white mr-2">{session.user?.name || session.user?.email}</span>
+                <span className="text-white mr-2 mx-auto px-5 font-bold text-xl">{session.user?.name || session.user?.email}</span>
                 <button onClick={() => signOut()} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg transition duration-300 shadow-lg shadow-orange-500/50">Logout</button>
               </>
             ) : (

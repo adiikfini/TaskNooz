@@ -1,0 +1,22 @@
+[
+  {
+    "objectId": "local-1",
+    "title": "Welcome to the Blog",
+    "summary": "This is a sample post shown when Backendless data is unavailable.",
+    "author": "System",
+    "publishDate": "2025-11-12",
+    "category": "RPA",
+    "imageUrl": "/uploads/sample-1.jpg",
+    "published": true
+  },
+  {
+    "objectId": "local-2",
+    "title": "Getting Started",
+    "summary": "Create posts using the Create Post form. This is sample content.",
+    "author": "System",
+    "publishDate": "2025-11-11",
+    "category": "AI/ML",
+    "imageUrl": "/uploads/sample-2.jpg",
+    "published": true
+  }
+]

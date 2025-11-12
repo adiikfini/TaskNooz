@@ -1,7 +1,7 @@
 // src/app/blog/page.tsx
-"use client"; // Ini adalah Client Component karena kita butuh state untuk filter
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
@@ -9,79 +9,17 @@ import Footer from '@/components/Footer';
 
 // Tipe data untuk Postingan Blog
 interface Post {
-  id: number;
-  slug: string;
+  objectId: string;
   title: string;
   summary: string;
   author: string;
   publishDate: string;
   category: 'RPA' | 'AI/ML' | 'Case Studies' | 'Industry News';
-  imageUrl: string;
+  imageUrl?: string;
+  tags?: string[];
+  published?: boolean;
+  createdAt?: string;
 }
-
-// --- Data Dummy untuk Blog ---
-const allPosts: Post[] = [
-  {
-    id: 1,
-    slug: "top-5-rpa-trends-in-2025",
-    title: "Top 5 RPA Trends to Watch in 2025",
-    summary: "Robotic Process Automation is evolving. Discover the key trends, from hyperautomation to AI integration, that will shape the industry next year.",
-    author: "Jane Doe",
-    publishDate: "Oct 28, 2025",
-    category: "RPA",
-    imageUrl: "https://images.pexels.com/photos/7567557/pexels-photo-7567557.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-  {
-    id: 2,
-    slug: "how-ai-is-revolutionizing-document-processing",
-    title: "How AI is Revolutionizing Document Processing (IDP)",
-    summary: "Learn how Intelligent Document Processing (IDP) uses AI and ML to read, extract, and process data from any document, eliminating manual entry.",
-    author: "John Smith",
-    publishDate: "Oct 25, 2025",
-    category: "AI/ML",
-    imageUrl: "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-  {
-    id: 3,
-    slug: "case-study-manufacturing-cost-saving",
-    title: "Case Study: How We Saved a Client $200k in Manufacturing",
-    summary: "A deep dive into how our custom automation solution streamlined the supply chain for a major manufacturing client, resulting in significant ROI.",
-    author: "Alice Johnson",
-    publishDate: "Oct 22, 2025",
-    category: "Case Studies",
-    imageUrl: "https://images.pexels.com/photos/4483610/pexels-photo-4483610.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-  {
-    id: 4,
-    slug: "future-of-work-automation-and-human-collaboration",
-    title: "The Future of Work: Automation and Human Collaboration",
-    summary: "Automation isn't about replacing humans; it's about augmenting them. We explore how bots and employees can work together to drive productivity.",
-    author: "David Lee",
-    publishDate: "Oct 20, 2025",
-    category: "Industry News",
-    imageUrl: "https://images.pexels.com/photos/8728381/pexels-photo-8728381.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-  {
-    id: 5,
-    slug: "getting-started-with-rpa-a-beginners-guide",
-    title: "Getting Started with RPA: A Beginner's Guide",
-    summary: "New to automation? This guide breaks down the basics of RPA, what it can do for your business, and how to start your first project.",
-    author: "Jane Doe",
-    publishDate: "Oct 18, 2025",
-    category: "RPA",
-    imageUrl: "https://images.pexels.com/photos/590022/pexels-photo-590022.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-  {
-    id: 6,
-    slug: "case-study-finance-department-automation",
-    title: "Case Study: Automating the Finance Department",
-    summary: "See how our RPA bots automated invoice processing and financial reporting for a leading fintech company, ensuring 100% accuracy.",
-    author: "Michael Brown",
-    publishDate: "Oct 15, 2025",
-    category: "Case Studies",
-    imageUrl: "https://images.pexels.com/photos/7788009/pexels-photo-7788009.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-  },
-];
 
 // Daftar kategori untuk filter
 const categories = ['All', 'RPA', 'AI/ML', 'Case Studies', 'Industry News'];
@@ -90,16 +28,79 @@ const categories = ['All', 'RPA', 'AI/ML', 'Case Studies', 'Industry News'];
 export default function BlogPage() {
   
   // --- State Management ---
-  // Menyimpan kategori yang sedang dipilih. Default-nya 'All'
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [rawResponse, setRawResponse] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
+  useEffect(() => {
+
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/blogs');
+        const json = await res.json().catch(() => null);
+        console.log('GET /api/blogs status=', res.status, 'ok=', res.ok, 'body=', json);
+        let postsData: any[] = [];
+          // keep the raw backend response available for debugging on the page
+          setRawResponse(json);
+          // If backend returned an error payload, surface it in the page-level error so it's visible
+        if (json == null) {
+          postsData = [];
+        } else if (Array.isArray(json)) {
+          postsData = json;
+        } else if (Array.isArray(json.data)) {
+          postsData = json.data;
+        } else if (json.data && typeof json.data === 'object') {
+          postsData = [json.data];
+        }
+
+  setPosts(postsData || []);
+  console.log('normalized postsData length=', (postsData || []).length, 'postsData=', postsData);
+        if (!res.ok && json?.error) {
+          setError(String(json.error));
+        } else if (json && typeof json === 'object' && json.error) {
+          setError(String(json.error));
+        } else {
+          setError(null);
+        }
+      } catch (err: any) {
+        console.error('fetchPosts error', err);
+        setError(err.message || 'Error loading blogs');
+        setPosts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPosts();
+  }, []);
+
   // Logika untuk memfilter postingan
-  const filteredPosts = allPosts.filter(post => {
+  const filteredPosts = posts.filter((post: Post) => {
     if (selectedCategory === 'All') {
-      return true; // Tampilkan semua jika 'All' dipilih
+      return true;
     }
-    return post.category === selectedCategory; // Tampilkan yang cocok
+    return post.category === selectedCategory;
   });
+
+  // Utility: check if a value is an absolute HTTP/HTTPS URL
+  const isAbsoluteHttpUrl = (value?: string) => {
+    if (!value || typeof value !== 'string') return false;
+    try {
+      const u = new URL(value);
+      return u.protocol === 'http:' || u.protocol === 'https:';
+    } catch (e) {
+      return false;
+    }
+  };
+
+  // Utility: check if value is a local path (served from same host) or a data URI
+  const isLocalOrDataUrl = (value?: string) => {
+    if (!value || typeof value !== 'string') return false;
+    return value.startsWith('/') || value.startsWith('data:');
+  };
 
   return (
     <div className="bg-gray-900 min-h-screen text-white">
@@ -146,70 +147,113 @@ export default function BlogPage() {
         <section className="py-20 bg-gray-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
-            {/* Grid Responsif */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              
-              {filteredPosts.length > 0 ? (
-                filteredPosts.map((post) => (
-                  // Kartu Blog
-                  <div 
-                    key={post.id}
-                    className="bg-gray-800 rounded-lg shadow-xl overflow-hidden flex flex-col
-                               transform transition duration-300 hover:scale-[1.03] hover:shadow-orange-700/50"
-                  >
-                    {/* Gambar */}
-                    <Link href={`/blog/${post.slug}`} className="block h-48 w-full relative">
-                      <Image 
-                        src={post.imageUrl} 
-                        alt={post.title}
-                        layout="fill"
-                        objectFit="cover"
-                      />
-                      <span className="absolute top-4 left-4 bg-orange-600 text-white text-xs font-bold uppercase px-2 py-1 rounded">
-                        {post.category}
-                      </span>
-                    </Link>
-                    
-                    {/* Konten Teks */}
-                    <div className="p-6 flex flex-col flex-grow">
-                      {/* Author & Date */}
-                      <div className="text-sm text-gray-400 mb-2">
-                        By <span className="font-medium text-gray-300">{post.author}</span> on {post.publishDate}
-                      </div>
-                      
-                      {/* Judul */}
-                      <Link href={`/blog/${post.slug}`}>
-                        <h3 className="text-xl font-bold text-white mb-3 hover:text-orange-400 transition-colors">
-                          {post.title}
-                        </h3>
-                      </Link>
-                      
-                      {/* Summary */}
-                      <p className="text-gray-400 text-sm mb-6 flex-grow">
-                        {post.summary}
-                      </p>
-                      
-                      {/* Tombol "Read More" */}
-                      <div className="mt-auto">
-                        <Link 
-                          href={`/blog/${post.slug}`}
-                          className="font-semibold text-orange-500 hover:text-orange-400 transition-colors"
-                        >
-                          Read More →
+            {loading && (
+              <div className="text-center py-12">
+                <h3 className="text-2xl font-bold text-gray-400">Loading blogs...</h3>
+              </div>
+            )}
+
+            {error && (
+              <div className="text-center py-12">
+                <h3 className="text-2xl font-bold text-red-400">Error: {error}</h3>
+              </div>
+            )}
+
+            {!loading && !error && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                {filteredPosts.length > 0 ? (
+                  filteredPosts.map((post: Post) => {
+                    const slug = post.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+                    return (
+                      // Kartu Blog
+                      <div 
+                        key={post.objectId}
+                        className="bg-gray-800 rounded-lg shadow-xl overflow-hidden flex flex-col
+                                   transform transition duration-300 hover:scale-[1.03] hover:shadow-orange-700/50"
+                      >
+                        {/* Gambar */}
+                        <Link href={`/blog/${slug}`} className="block h-48 w-full relative">
+                          {(() => {
+                            const src = post.imageUrl as string | undefined;
+                            if (isAbsoluteHttpUrl(src)) {
+                              return (
+                                <Image
+                                  src={src as string}
+                                  alt={post.title}
+                                  fill
+                                  style={{ objectFit: 'cover' }}
+                                  sizes="(max-width: 768px) 100vw, 33vw"
+                                />
+                              );
+                            }
+                            if (isLocalOrDataUrl(src)) {
+                              // For local paths (e.g. /uploads/...) or data: URIs, render a normal <img>
+                              return (
+                                <img src={src} alt={post.title} className="w-full h-full object-cover" />
+                              );
+                            }
+                            // Fallback placeholder when there's no valid image
+                            return (
+                              <div className="w-full h-full bg-gradient-to-r from-orange-600 to-orange-700 flex items-center justify-center">
+                                <span className="text-white text-center px-4">📰 No Image</span>
+                              </div>
+                            );
+                          })()}
+                          <span className="absolute top-4 left-4 bg-orange-600 text-white text-xs font-bold uppercase px-2 py-1 rounded">
+                            {post.category}
+                          </span>
                         </Link>
+                        
+                        {/* Konten Teks */}
+                        <div className="p-6 flex flex-col grow">
+                          {/* Author & Date */}
+                          <div className="text-sm text-gray-400 mb-2">
+                            By <span className="font-medium text-gray-300">{post.author}</span> on {post.publishDate}
+                          </div>
+                          
+                          {/* Judul */}
+                          <Link href={`/blog/${slug}`}>
+                            <h3 className="text-xl font-bold text-white mb-3 hover:text-orange-400 transition-colors">
+                              {post.title}
+                            </h3>
+                          </Link>
+                          
+                          {/* Summary */}
+                          <p className="text-gray-400 text-sm mb-6 grow">
+                            {post.summary}
+                          </p>
+                          
+                          {/* Tombol "Read More" */}
+                          <div className="mt-auto">
+                            <Link 
+                              href={`/blog/${slug}`}
+                              className="font-semibold text-orange-500 hover:text-orange-400 transition-colors"
+                            >
+                              Read More →
+                            </Link>
+                          </div>
+                        </div>
                       </div>
+                    );
+                  })
+                ) : (
+                  // Tampilan jika tidak ada postingan
+                  <div className="col-span-full text-center py-12">
+                    <h3 className="text-2xl font-bold text-gray-400">No posts found</h3>
+                    <p className="text-gray-500">There are no articles in the "{selectedCategory}" category yet.</p>
+                    {/* Developer debug: show raw /api/blogs response so we can map fields */}
+                    <div className="mt-6 text-left text-xs text-gray-400 max-w-4xl mx-auto px-4">
+                      <div className="font-semibold text-sm text-gray-300 mb-2">Debug: /api/blogs response</div>
+                      <pre className="whitespace-pre-wrap break-words bg-gray-800 p-3 rounded text-[11px]">
+                        {JSON.stringify(rawResponse ?? '(no JSON response)', null, 2)}
+                      </pre>
                     </div>
                   </div>
-                ))
-              ) : (
-                // Tampilan jika tidak ada postingan
-                <div className="col-span-full text-center py-12">
-                  <h3 className="text-2xl font-bold text-gray-400">No posts found</h3>
-                  <p className="text-gray-500">There are no articles in the "{selectedCategory}" category yet.</p>
-                </div>
-              )}
+                )}
 
-            </div>
+              </div>
+            )}
           </div>
         </section>
 

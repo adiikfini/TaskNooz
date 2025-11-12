@@ -1,5 +1,5 @@
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import nextAuthOptions from "@/lib/nextAuthOptions";
 
 const BACKENDLESS_APP_ID = process.env.BACKENDLESS_APP_ID ?? "71966029-41AC-4ADD-93F6-07BE88132275";
 const BACKENDLESS_REST_KEY = process.env.BACKENDLESS_REST_API_KEY ?? "22309958-AC30-44D3-9E86-CC2190106F5D";
@@ -15,60 +15,10 @@ async function backendlessLogin(email?: string, password?: string) {
   });
   if (!res.ok) return null;
   const data = await res.json();
-  // Backendless may return the user token in header 'user-token'
   const userToken = res.headers.get("user-token") || (data && (data['user-token'] || data['userToken']));
   return { data, userToken };
 }
 
-const handler = NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: { label: "Email", type: "email", placeholder: "email@example.com" },
-        password: { label: "Password", type: "password" },
-      },
-      async authorize(credentials) {
-        const result = await backendlessLogin(credentials?.email, credentials?.password);
-        if (!result) return null;
-        const { data, userToken } = result as any;
-        return {
-          id: data.objectId || data.objectID || data.object_id || data.userId || data.objectId,
-          name: data.name || data.email,
-          email: data.email,
-          backendlessToken: userToken,
-          backendlessUser: data,
-        };
-      },
-    }),
-  ],
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = (user as any).id;
-        token.email = (user as any).email;
-        token.name = (user as any).name;
-        token.backendlessToken = (user as any).backendlessToken;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).id = token.id as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
-        (session.user as any).backendlessToken = token.backendlessToken as string;
-      }
-      return session;
-    },
-  },
-});
+const handler = NextAuth(nextAuthOptions as any);
 
 export { handler as GET, handler as POST };
